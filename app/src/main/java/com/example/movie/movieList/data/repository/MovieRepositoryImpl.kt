@@ -1,5 +1,6 @@
 package com.example.movie.movieList.data.repository
 
+import android.util.Log
 import coil.network.HttpException
 import com.example.movie.movieList.data.local.MovieDatabase
 import com.example.movie.movieList.data.mappers.toMovie
@@ -26,17 +27,13 @@ class MovieRepositoryImpl @Inject constructor(
             emit(Resource.Loading(true))
             val localMovieData = db.movieDao.fetchMovieListByCategory(category)
             val fetchMovieFromDatabase = localMovieData.isNotEmpty() && !forceFetchFromApi
-
             if (fetchMovieFromDatabase) {
                 emit(Resource.Success(
                     data = localMovieData.map { movieEntity -> movieEntity.toMovie(category) }
-
                 ))
                 emit(Resource.Loading(false))
-
                 return@flow
             }
-
             val moviesFromApi = try {
                 api.getMovies(category = category, page = page)
             } catch (e: IOException) {
@@ -46,7 +43,7 @@ class MovieRepositoryImpl @Inject constructor(
                 emit(Resource.Error(message = "Network Error has occurred"))
                 return@flow
             } catch (e: Exception) {
-                emit(Resource.Error(message = "Error has occurred"))
+                emit(Resource.Error(message = "Error has occurred ${e}"))
                 return@flow
             }
             val movieEntityList = moviesFromApi
@@ -60,7 +57,6 @@ class MovieRepositoryImpl @Inject constructor(
                 }
             ))
             emit(Resource.Loading(false))
-
 
         }
 
