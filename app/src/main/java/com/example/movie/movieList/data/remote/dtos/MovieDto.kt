@@ -1,4 +1,4 @@
-package com.example.movie.movieList.data.dtos
+package com.example.movie.movieList.data.remote.dtos
 
 data class MovieDto(
     val adult: Boolean?,
